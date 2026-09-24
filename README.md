@@ -48,7 +48,8 @@ Three logged DEV cases:
 | PN-1009 | `map reject` status R | Map reject, `code not in table` |
 | PN-1010 | `target 422` broker.id missing | Payload has no `broker`; HTTP 422 |
 
+Uses the stdlib only (`unittest`). No extra packages.
+
 ```bash
-python3 -m pip install -r requirements.txt
-python3 -m pytest -q
+python3 -m unittest discover -s tests -v
 ```

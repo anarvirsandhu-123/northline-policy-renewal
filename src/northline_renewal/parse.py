@@ -32,4 +32,4 @@ def _text(root: ET.Element, tag: str) -> str:
     node = root.find(tag)
     if node is None or node.text is None:
         return ""
-        return node.text.strip()
+    return node.text.strip()
