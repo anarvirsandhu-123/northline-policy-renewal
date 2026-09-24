@@ -1,0 +1,3 @@
+2026-09-01T09:14:02Z INFO map ok policy=PN-1008 status=A premium=1,250.00 broker=B19
+2026-09-01T09:14:03Z ERROR map reject policy=PN-1009 status=R reason=code not in table
+2026-09-01T09:14:04Z ERROR target 422 policy=PN-1010 reason=broker.id missing

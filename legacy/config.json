@@ -1,0 +1,5 @@
+{
+  "receiveLocation": "PolicyAdmin.Renewals",
+  "targetHost": "broker-notify.dev.northline.example",
+  "credentials": "stored in BizTalk SSO, not in this file"
+}

@@ -1,0 +1,13 @@
+{
+  "name": "PolicyRenewal_to_BrokerNotify",
+  "source": "PolicyRenewal canonical XML",
+  "target": "POST /v2/renewals",
+  "fields": [
+    {"from": "PolicyNumber", "to": "policyNumber", "rule": "direct"},
+    {"from": "StatusCode", "to": "status", "rule": "A,C,L,P to ACTIVE,CANCELLED,LAPSED,PENDING. Code R appears in logs and is not in the spec."},
+    {"from": "EffectiveDate", "to": "effectiveDate", "rule": "source yyyyMMdd with no timezone. Target wants ISO-8601. UTC or local is not specified."},
+    {"from": "PremiumAmount", "to": "premium", "rule": "source string, may contain commas. Target decimal. Cancellations sometimes send a blank premium."},
+    {"from": "BrokerCode", "to": "broker.id", "rule": "required on target. Sometimes empty on source. No default documented."},
+    {"from": "Channel", "to": null, "rule": "values DIR, AGG, WHL. No target field."}
+  ]
+}
