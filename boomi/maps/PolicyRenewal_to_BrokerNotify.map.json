@@ -1,0 +1,82 @@
+{
+  "name": "PolicyRenewal_to_BrokerNotify",
+  "environment": "DEV",
+  "sourceProfile": "PolicyRenewal canonical XML",
+  "targetProfile": "POST /v2/renewals JSON",
+  "unknownTargetFields": "rejected by API",
+  "openQuestions": [
+    {
+      "id": "status-R",
+      "field": "StatusCode",
+      "issue": "Code R appears in DEV logs (PN-1009) and is not in the spec (A/C/L/P only). No mapping is invented.",
+      "behaviorUntilResolved": "map reject; reason=code not in table"
+    },
+    {
+      "id": "effectiveDate-timezone",
+      "field": "EffectiveDate",
+      "issue": "Source is yyyyMMdd with no timezone. Target wants ISO-8601. UTC vs local is unspecified.",
+      "behaviorUntilResolved": "emit date-only ISO-8601 (yyyy-MM-dd). Do not append time or Z."
+    },
+    {
+      "id": "empty-BrokerCode",
+      "field": "BrokerCode",
+      "issue": "broker.id is required on the target. Source is sometimes empty. No default is documented.",
+      "behaviorUntilResolved": "omit broker.id; target returns HTTP 422 (PN-1010)"
+    },
+    {
+      "id": "Channel",
+      "field": "Channel",
+      "issue": "Source values DIR, AGG, WHL. No target field. Unknown fields are rejected.",
+      "behaviorUntilResolved": "do not map Channel"
+    }
+  ],
+  "fields": [
+    {
+      "from": "PolicyNumber",
+      "to": "policyNumber",
+      "transform": "direct"
+    },
+    {
+      "from": "StatusCode",
+      "to": "status",
+      "transform": "lookup",
+      "table": {
+        "A": "ACTIVE",
+        "C": "CANCELLED",
+        "L": "LAPSED",
+        "P": "PENDING"
+      },
+      "unmapped": "reject"
+    },
+    {
+      "from": "EffectiveDate",
+      "to": "effectiveDate",
+      "transform": "date",
+      "fromFormat": "yyyyMMdd",
+      "toFormat": "yyyy-MM-dd",
+      "timezone": null
+    },
+    {
+      "from": "PremiumAmount",
+      "to": "premium",
+      "transform": "decimal",
+      "stripCharacters": [","],
+      "blank": {
+        "allowedWhenStatus": "CANCELLED",
+        "value": null,
+        "otherwise": "reject"
+      }
+    },
+    {
+      "from": "BrokerCode",
+      "to": "broker.id",
+      "transform": "direct",
+      "empty": "omit"
+    },
+    {
+      "from": "Channel",
+      "to": null,
+      "transform": "drop"
+    }
+  ]
+}
