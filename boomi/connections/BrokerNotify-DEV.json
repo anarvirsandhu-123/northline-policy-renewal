@@ -1,0 +1,13 @@
+{
+  "name": "BrokerNotify-DEV",
+  "type": "HTTP",
+  "environment": "DEV",
+  "host": "broker-notify.dev.northline.example",
+  "method": "POST",
+  "path": "/v2/renewals",
+  "auth": {
+    "mechanism": "environment-extension",
+    "sourceToday": "BizTalk SSO",
+    "note": "Credentials stay in BizTalk SSO. Provision the same secret as a Boomi environment extension. Do not store passwords, tokens, or SSO tickets in this repository or in the map."
+  }
+}

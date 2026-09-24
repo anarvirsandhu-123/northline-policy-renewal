@@ -1,0 +1,55 @@
+{
+  "name": "PolicyRenewalNotification",
+  "environment": "DEV",
+  "legacyOrchestration": "PolicyRenewalNotification",
+  "description": "First-slice Boomi process: PolicyAdmin canonical XML → map PolicyRenewal_to_BrokerNotify → POST /v2/renewals. DEV only.",
+  "secrets": "Do not copy BizTalk SSO credentials into this process or the map. Use a Boomi environment extension that references the existing SSO material.",
+  "openQuestions": [
+    "status-R: StatusCode R is in DEV logs, not in the spec. Map rejects. No default status.",
+    "effectiveDate-timezone: UTC vs local unspecified. Date-only ISO-8601; no offset invented.",
+    "empty-BrokerCode: no default broker.id. Omit and let the target return 422.",
+    "Channel: no target field. Do not map."
+  ],
+  "shapes": [
+    {
+      "id": "start",
+      "type": "Start",
+      "listen": {
+        "receiveLocation": "PolicyAdmin.Renewals",
+        "payload": "PolicyRenewal canonical XML"
+      }
+    },
+    {
+      "id": "map",
+      "type": "Map",
+      "component": "PolicyRenewal_to_BrokerNotify",
+      "onReject": "stop_map_reject"
+    },
+    {
+      "id": "http_post",
+      "type": "HTTP Client",
+      "connection": "BrokerNotify-DEV",
+      "method": "POST",
+      "path": "/v2/renewals",
+      "on422": "stop_http_422"
+    },
+    {
+      "id": "stop_ok",
+      "type": "Stop",
+      "when": "HTTP 2xx"
+    },
+    {
+      "id": "stop_map_reject",
+      "type": "Stop",
+      "when": "MapReject",
+      "example": "PN-1009 StatusCode R — code not in table"
+    },
+    {
+      "id": "stop_http_422",
+      "type": "Stop",
+      "when": "HTTP 422",
+      "example": "PN-1010 missing broker.id — no default applied"
+    }
+  ],
+  "sequence": ["start", "map", "http_post", "stop_ok"]
+}
